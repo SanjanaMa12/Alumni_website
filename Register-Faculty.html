@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AAUP - Register - Pick Faculty</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+
+<header class="bg-[#5a0a0a] text-white text-xs py-2">
+  <div class="max-w-7xl mx-auto px-6 flex justify-between">
+    <span>University of Peradeniya | Alumni Association (AAUP) | pdn.ac.lk</span>
+    <span>Contact: aaup@pdn.ac.lk | Login | Register</span>
+  </div>
+</header>
+<header class="bg-white shadow-sm">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-[#7a0a0a] rounded-full flex items-center justify-center text-white font-bold">UOP</div>
+      <div>
+        <div class="font-bold text-[#7a0a0a]">University of Peradeniya</div>
+        <div class="text-[11px] text-gray-500">AAUP Global Alumni Connect</div>
+      </div>
+    </div>
+    <nav class="flex gap-6 text-sm font-medium items-center">
+      <a href="index.html" class="text-[#7a0a0a] font-bold">Home</a>
+      <a href="events.html">Events</a>
+      <a href="projects.html">Projects</a>
+      <a href="directory.html">Directory</a>
+      <a href="blog.html">Blog</a>
+      <a href="login.html" class="px-4 py-1.5 border border-[#7a0a0a] rounded-full">Login</a>
+      <a href="register-faculty.html" class="px-4 py-1.5 bg-[#7a0a0a] text-white rounded-full">Register</a>
+    </nav>
+  </div>
+</header>
+
+<section class="max-w-3xl mx-auto px-6 py-16">
+  <div class="text-center mb-10">
+    <h1 class="text-3xl font-bold text-[#7a0a0a]">Select Your Faculty</h1>
+    <p class="text-gray-500 mt-2">Pick your faculty to proceed to registration</p>
+  </div>
+  <div class="bg-white rounded-2xl shadow-sm border p-8">
+    <label class="text-sm font-semibold">Faculty *</label>
+    <select id="facultySelect" class="w-full mt-2 p-4 border-2 border-[#7a0a0a]/20 rounded-xl bg-gray-50 text-base font-medium focus:border-[#7a0a0a] outline-none">
+      <option value="">-- Select Your Faculty --</option>
+      <option value="Engineering">Faculty of Engineering</option>
+      <option value="Arts">Faculty of Arts</option>
+      <option value="Science">Faculty of Science</option>
+      <option value="Medicine">Faculty of Medicine</option>
+      <option value="Agriculture">Faculty of Agriculture</option>
+      <option value="Management">Faculty of Management</option>
+      <option value="Veterinary">Faculty of Veterinary Medicine & Animal Science</option>
+      <option value="Dental">Faculty of Dental Sciences</option>
+      <option value="Allied Health">Faculty of Allied Health Sciences</option>
+    </select>
+    <div class="mt-6 flex gap-3">
+      <a href="index.html" class="px-6 py-3 border rounded-full">Back</a>
+      <button onclick="goToForm()" class="flex-1 py-3 bg-[#7a0a0a] text-white rounded-full font-bold">Continue to Registration Form →</button>
+    </div>
+    <div class="mt-6 text-xs text-gray-500 text-center">Simple dropdown - not complicated - pick faculty and continue</div>
+  </div>
+</section>
+
+<footer class="bg-[#1a1a1a] text-white/60 py-8 px-6 text-sm mt-16">
+  <div class="max-w-7xl mx-auto">University of Peradeniya - Peradeniya 20400 - AAUP - Reg No: AAUP-YYYY-FAC-XXXX</div>
+</footer>
+
+<script>
+function goToForm(){
+  const fac = document.getElementById('facultySelect').value;
+  if(!fac){ alert('Please select your faculty'); return; }
+  window.location.href = 'register-form.html?faculty=' + fac;
+}
+</script>
+</body>
+</html>

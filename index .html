@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AAUP - Home</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>body{font-family:Inter}</style>
+</head>
+<body class="bg-gray-50">
+
+<header class="bg-[#5a0a0a] text-white text-xs py-2">
+  <div class="max-w-7xl mx-auto px-6 flex justify-between">
+    <span>University of Peradeniya | Alumni Association (AAUP) | pdn.ac.lk</span>
+    <span>Contact: aaup@pdn.ac.lk | Login | Register</span>
+  </div>
+</header>
+<header class="bg-white shadow-sm">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-[#7a0a0a] rounded-full flex items-center justify-center text-white font-bold">UOP</div>
+      <div>
+        <div class="font-bold text-[#7a0a0a]">University of Peradeniya</div>
+        <div class="text-[11px] text-gray-500">AAUP Global Alumni Connect</div>
+      </div>
+    </div>
+    <nav class="flex gap-6 text-sm font-medium items-center">
+      <a href="index.html" class="text-[#7a0a0a] font-bold">Home</a>
+      <a href="events.html">Events</a>
+      <a href="projects.html">Projects</a>
+      <a href="directory.html">Directory</a>
+      <a href="blog.html">Blog</a>
+      <a href="login.html" class="px-4 py-1.5 border border-[#7a0a0a] rounded-full">Login</a>
+      <a href="register-faculty.html" class="px-4 py-1.5 bg-[#7a0a0a] text-white rounded-full">Register</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Video Hero -->
+<section class="relative h- overflow-hidden bg-black">
+  <video autoplay muted loop playsinline class="absolute w-full h-full object-cover">
+    <source src="video/video.mp4" type="video/mp4">
+  </video>
+  <!-- LIGHT overlay only for text readability - video stays CLEAR -->
+  <div class="absolute inset-0 bg-black/20"></div>
+  <div class="absolute inset-0 bg-gradient-to-r from-black/40 to-transparent"></div>
+
+  <div class="relative z-10 max-w-7xl mx-auto px-6 h-full flex flex-col justify-center text-white">
+    <h1 class="text-5xl font-bold leading-tight drop-shadow-lg">Welcome to the<br>Global Alumni Family</h1>
+    <p class="mt-4 text-lg text-white max-w-xl drop-shadow-md">Connecting 1,247+ Alumni across 23 countries to support current students.</p>
+    <div class="flex gap-4 mt-8">
+      <a href="register-faculty.html" class="px-8 py-3 bg-[#d4af37] text-[#4a0404] rounded-full font-bold shadow-lg">Register Now →</a>
+      <a href="login.html" class="px-8 py-3 bg-white text-[#7a0a0a] rounded-full font-bold shadow-lg">Login</a>
+    </div>
+    <div class="flex gap-8 mt-10 text-sm font-semibold drop-shadow-md">
+      <div><span class="text-2xl font-bold">1,247</span> Alumni</div>
+      <div><span class="text-2xl font-bold">23</span> Countries</div>
+      <div><span class="text-2xl font-bold">9</span> Faculties</div>
+    </div>
+  </div>
+</section>
+<!-- Alumni Relations Office Message - ARO square fill with uop photo and add university photos -->
+<section class="max-w-7xl mx-auto px-6 py-16">
+  <div class="bg-white rounded-2xl p-8 shadow-sm border flex gap-8">
+    <div class="w-48 h-48 rounded-2xl overflow-hidden flex-shrink-0 bg-gray-100">
+      <img src="images/senate.jpg" class="w-full h-full object-cover" alt="University of Peradeniya">
+    </div>
+    <div class="flex-1">
+      <h2 class="text-2xl font-bold text-[#7a0a0a]">Message from Alumni Relationship Office</h2>
+      <p class="mt-4 text-gray-600 leading-relaxed">Welcome to the Alumni Family! We are delighted to have you back to your home - University of Peradeniya. Our office is committed to building a lifelong bond between the university and its global alumni.</p>
+      <p class="mt-3 text-gray-600">Through this portal, you can connect with your faculty juniors, support scholarships, research funds, internships and be part of our annual Open Day at Wala with Drama, Tea Gathering and more.</p>
+      
+      <div class="mt-6 grid grid-cols-3 gap-4">
+        <div class="rounded-xl overflow-hidden border">
+          <div class="h-32 overflow-hidden">
+            <img src="images/SENATE-BLDG.jpg" class="w-full h-full object-cover" alt="Senate Building">
+          </div>
+          <div class="p-2 text-center text-xs font-medium bg-gray-50">Senate Building</div>
+        </div>
+
+        <div class="rounded-xl overflow-hidden border">
+          <div class="h-32 overflow-hidden">
+            <img src="images/images.jpg" class="w-full h-full object-cover" alt="Wala Theater">
+          </div>
+          <div class="p-2 text-center text-xs font-medium bg-gray-50">Wala Theater</div>
+        </div>
+
+        <div class="rounded-xl overflow-hidden border">
+          <div class="h-32 overflow-hidden">
+            <img src="images/pera.jpg" class="w-full h-full object-cover" alt="Art faculty">
+          </div>
+          <div class="p-2 text-center text-xs font-medium bg-gray-50">Art faculty</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<footer class="bg-[#1a1a1a] text-white/60 py-8 px-6 text-sm mt-16">
+  <div class="max-w-7xl mx-auto">University of Peradeniya - Peradeniya 20400 - AAUP - Reg No: AAUP-YYYY-FAC-XXXX</div>
+</footer>
+
+</body>
+</html>
