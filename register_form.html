@@ -2,83 +2,225 @@
 <html>
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ARO - Register Form</title>
+<title>ARO - Register Form - Final</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<style>
+.year-btn.active{background:#7a0a0a;color:white}
+.form-section{transition:all 0.3s ease}
+</style>
 </head>
 <body class="bg-gray-50">
-
 <header class="bg-[#5a0a0a] text-white text-xs py-2">
   <div class="max-w-7xl mx-auto px-6 flex justify-between">
     <span>University of Peradeniya | Alumni Relations Office | pdn.ac.lk</span>
     <span>Contact: aro@pdn.ac.lk | Login | Register</span>
   </div>
 </header>
-  <header class="bg-white shadow-sm">
+<header class="bg-white shadow-sm">
   <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
     <div class="flex items-center gap-3">
-      <!-- UOP LOGO CIRCLE -->
       <div class="w-10 h-10 rounded-full overflow-hidden bg-white border-2 border-[#7a0a0a] flex-shrink-0">
         <img src="images/uop-logo.png" class="w-full h-full object-cover rounded-full" alt="UOP Logo">
       </div>
       <div>
         <div class="font-bold text-[#7a0a0a]">University of Peradeniya</div>
-        <div class="text- text-gray-500">Global Alumni Connect</div>
+        <div class="text-[11px] text-gray-500">Global Alumni Connect</div>
       </div>
     </div>
-    <nav class="flex gap-6 text-sm font-medium items-center">
-      <a href="index.html" class="text-[#7a0a0a] font-bold">Home</a>
-      <a href="events.html">Events</a>
-      <a href="projects.html">Projects</a>
-      <a href="directory.html">Directory</a>
-      <a href="blog.html">Blog</a>
-      <a href="login.html" class="px-4 py-1.5 border border-[#7a0a0a] rounded-full">Login</a>
-      <a href="register_faculty.html" class="px-4 py-1.5 bg-[#7a0a0a] text-white rounded-full">Register</a>
-    </nav>
-  </div>
-</header>
+<nav class="flex gap-4 text-sm items-center"><a href="index.html">Home</a><a href="register_faculty.html" class="px-4 py-1.5 bg-[#7a0a0a] text-white rounded-full">Register</a></nav></div></header>
 
-<section class="max-w-3xl mx-auto px-6 py-12">
-  <div class="bg-white rounded-2xl shadow-sm border p-8">
-    <h1 class="text-2xl font-bold">Alumni Registration Form</h1>
-    <p class="text-sm text-gray-500 mt-1">Faculty: <span id="fac" class="font-bold text-[#7a0a0a]">Engineering</span></p>
-    <div class="space-y-5 mt-6">
-      <div><label class="text-sm font-semibold">Full Name *</label><input class="w-full mt-1 p-3 border rounded-lg bg-gray-50" placeholder="Kasun Perera"></div>
-      <div><label class="text-sm font-semibold">Email *</label><input class="w-full mt-1 p-3 border rounded-lg bg-gray-50" placeholder="kasun@gmail.com"></div>
-      <div class="grid grid-cols-2 gap-4">
-        <div><label class="text-sm font-semibold">Phone Number *</label><input class="w-full mt-1 p-3 border rounded-lg bg-gray-50" placeholder="+94 7X XXX XXXX"></div>
-        <div><label class="text-sm font-semibold">Year of Graduation *</label><select class="w-full mt-1 p-3 border rounded-lg bg-gray-50"><option>2018</option><option>2019</option><option>2020</option></select></div>
-      </div>
-      <div><label class="text-sm font-semibold">Reg No (Not Mandatory)</label><input class="w-full mt-1 p-3 border rounded-lg bg-gray-50" placeholder=" S/12/045"></div>
-      <div class="p-4 bg-blue-50 rounded-lg border border-blue-100"><label class="flex gap-2 text-sm"><input type="checkbox" checked> <span>I agree to display my details in directory</span></label></div>
-      <div><label class="text-sm font-semibold">How would you like to support students/campus? (Optional)</label>
-        <div class="grid grid-cols-2 gap-2 mt-2 text-sm">
-          <label class="flex gap-2 p-2 border rounded"><input type="checkbox"> Internships</label>
-          <label class="flex gap-2 p-2 border rounded"><input type="checkbox"> RA Funds</label>
-          <label class="flex gap-2 p-2 border rounded"><input type="checkbox"> Scholarships</label>
-          <label class="flex gap-2 p-2 border rounded"><input type="checkbox"> Part-time Jobs</label>
-          <label class="flex gap-2 p-2 border rounded"><input type="checkbox"> Mentorship</label>
-          <label class="flex gap-2 p-2 border rounded"><input type="checkbox"> Guest Lecture</label>
-        </div>
-      </div>
-      <!-- OTP AFTER ALL INFO FILL to confirm email -->
-      <div class="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-        <label class="text-sm font-semibold">Email Confirmation - OTP</label>
-        <p class="text-xs text-gray-600 mt-1">After filling all info, confirm your email with OTP</p>
-        <div class="flex gap-2 mt-2"><button class="px-4 py-2 bg-[#7a0a0a] text-white rounded-lg text-sm">Send OTP to Email</button><input class="flex-1 p-2 border rounded-lg" placeholder="Enter OTP to confirm email"></div>
-      </div>
-      <button class="w-full py-3 bg-[#7a0a0a] text-white rounded-full font-bold">Submit</button>
-    </div>
-  </div>
+<section class="max-w-4xl mx-auto px-4 py-6">
+<div class="flex items-center justify-center gap-2 mb-6 text-xs">
+<div id="s1" class="flex items-center gap-2"><div class="w-7 h-7 bg-[#7a0a0a] text-white rounded-full flex items-center justify-center font-bold">1</div><span class="font-semibold">Basic</span></div>
+<div class="w-10 h-0.5 bg-gray-200" id="l1"></div>
+<div id="s2" class="flex items-center gap-2 opacity-50"><div class="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center font-bold">2</div><span>Contact</span></div>
+<div class="w-10 h-0.5 bg-gray-200" id="l2"></div>
+<div id="s3" class="flex items-center gap-2 opacity-50"><div class="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center font-bold">3</div><span>Academic</span></div>
+<div class="w-10 h-0.5 bg-gray-200" id="l3"></div>
+<div id="s4" class="flex items-center gap-2 opacity-50"><div class="w-7 h-7 bg-gray-200 rounded-full flex items-center justify-center font-bold">4</div><span>More Details</span></div>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border p-6 md:p-8">
+<h1 class="text-xl font-bold">Alumni Registration</h1>
+<p class="text-sm text-gray-500">Faculty: <span id="fac" class="font-bold text-[#7a0a0a]">-</span> <a href="register_faculty.html" class="text-xs underline ml-2">Change</a></p>
+
+<form id="alumniForm" class="mt-6">
+<input type="hidden" name="faculty" id="faculty_input">
+<input type="hidden" name="grad_year" id="grad_year_input" required>
+
+<!-- SECTION 1: Name + Preferred Name - ONE LINE -->
+<div id="sec-name" class="form-section">
+<div class="flex items-center gap-2 mb-3">
+<div class="w-6 h-6 bg-[#7a0a0a] text-white rounded-full flex items-center justify-center text-xs">1</div><h3 class="font-bold">Your Name</h3><span class="text-xs text-gray-400 ml-auto">Press Enter to continue →</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div><label class="text-sm font-semibold">Full Name (as in certificate) *</label><input name="full_name" id="fullName" required class="w-full mt-1 p-3 border-2 rounded-xl bg-gray-50 focus:border-[#7a0a0a] outline-none" placeholder="Kasun Sampath Perera" onkeydown="if(event.key==='Enter'){event.preventDefault();goToEmail()}">
+</div>
+<div><label class="text-sm font-semibold">Preferred Name *</label><input name="preferred_name" id="prefName" required class="w-full mt-1 p-3 border-2 rounded-xl bg-gray-50 focus:border-[#7a0a0a] outline-none" placeholder="Kasun" onkeydown="if(event.key==='Enter'){event.preventDefault();goToEmail()}"></div>
+</div>
+<button type="button" onclick="goToEmail()" class="mt-4 px-6 py-2.5 bg-[#7a0a0a] text-white rounded-full text-sm font-bold">Next: Email & Phone → (Press Enter)</button>
+</div>
+
+<!-- SECTION 2: Email + Phone - ONE LINE -->
+<div id="sec-contact" class="form-section hidden">
+<div class="flex items-center gap-2 mb-3 mt-2"><div class="w-6 h-6 bg-[#7a0a0a] text-white rounded-full flex items-center justify-center text-xs">2</div><h3 class="font-bold">Contact Details</h3><span class="text-xs text-gray-400 ml-auto">Press Enter to continue →</span></div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div><label class="text-sm font-semibold">Email *</label><input type="email" name="email" id="emailInput" required class="w-full mt-1 p-3 border-2 rounded-xl bg-gray-50 focus:border-[#7a0a0a] outline-none" placeholder="kasun@gmail.com" onkeydown="if(event.key==='Enter'){event.preventDefault();goToAcademic()}"></div>
+<div><label class="text-sm font-semibold">Phone Number *</label><input name="phone" id="phoneInput" required class="w-full mt-1 p-3 border-2 rounded-xl bg-gray-50 focus:border-[#7a0a0a] outline-none" placeholder="+94 77 XXX XXXX" onkeydown="if(event.key==='Enter'){event.preventDefault();goToAcademic()}"></div>
+</div>
+<div class="flex gap-3 mt-4">
+<button type="button" onclick="backToName()" class="px-5 py-2.5 border rounded-full text-sm">← Back</button>
+<button type="button" onclick="goToAcademic()" class="px-6 py-2.5 bg-[#7a0a0a] text-white rounded-full text-sm font-bold">Next →</button>
+</div>
+</div>
+
+<!-- SECTION 3: Remaining - Year Grid + Degree + Reg No -->
+<div id="sec-academic" class="form-section hidden">
+<div class="flex items-center gap-2 mb-3 mt-2"><div class="w-6 h-6 bg-[#7a0a0a] text-white rounded-full flex items-center justify-center text-xs">3</div><h3 class="font-bold">Academic Details</h3></div>
+
+<div class="space-y-5">
+<div>
+<label class="text-sm font-semibold">Year of Graduation * (1950-2026) - Select from grid</label>
+<div class="mt-2 p-3 bg-white border-2 rounded-xl">
+<div class="flex flex-wrap gap-1 mb-2" id="decadeTabs">
+<button type="button" onclick="showDecade(1950)" class="decade-tab px-2.5 py-1 text- font-bold rounded-full border" data-decade="1950">1950s</button>
+<button type="button" onclick="showDecade(1960)" class="decade-tab px-2.5 py-1 text- font-bold rounded-full border" data-decade="1960">1960s</button>
+<button type="button" onclick="showDecade(1970)" class="decade-tab px-2.5 py-1 text- font-bold rounded-full border" data-decade="1970">1970s</button>
+<button type="button" onclick="showDecade(1980)" class="decade-tab px-2.5 py-1 text- font-bold rounded-full border" data-decade="1980">1980s</button>
+<button type="button" onclick="showDecade(1990)" class="decade-tab px-2.5 py-1 text- font-bold rounded-full border" data-decade="1990">1990s</button>
+<button type="button" onclick="showDecade(2000)" class="decade-tab px-2.5 py-1 text- font-bold rounded-full border" data-decade="2000">2000s</button>
+<button type="button" onclick="showDecade(2010)" class="decade-tab px-2.5 py-1 text- font-bold rounded-full border bg-[#7a0a0a] text-white" data-decade="2010">2010s</button>
+<button type="button" onclick="showDecade(2020)" class="decade-tab px-2.5 py-1 text- font-bold rounded-full border" data-decade="2020">2020-26</button>
+</div>
+<div class="flex gap-2 mb-2"><input type="number" id="yearSearch" placeholder="Type year e.g. 1985" min="1950" max="2026" class="w-36 p-2 border rounded-lg text-xs" oninput="jumpToYear(this.value)"><span id="selectedYearDisplay" class="text-sm font-bold text-[#7a0a0a] hidden">Selected: <span id="selectedYearText"></span></span></div>
+<div id="yearGrid" class="grid grid-cols-5 gap-1.5 max-h-36 overflow-y-auto"></div>
+</div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div><label class="text-sm font-semibold">Do you remember Reg No? *</label><div class="flex gap-4 mt-2"><label class="flex items-center gap-1 text-sm"><input type="radio" name="rememberRegNo" value="yes" onchange="toggleVerification()"> Yes</label><label class="flex items-center gap-1 text-sm"><input type="radio" name="rememberRegNo" value="no" onchange="toggleVerification()"> No</label></div></div>
+</div>
+
+<div id="regNoSection" class="hidden"><label class="text-sm font-semibold">Registration Number *</label><input type="text" id="regNo" name="reg_no" class="w-full mt-1 p-3 border rounded-xl" placeholder="E/16/123"></div>
+<div id="degreeSection" class="hidden"><label class="text-sm font-semibold">Upload Degree Certificate *</label><input type="file" name="degree_cert" class="w-full mt-1 p-3 border rounded-xl bg-white" accept=".pdf,.jpg,.png"></div>
+
+<div class="mt-4 p-3 bg-blue-50 rounded-xl border border-blue-100"><label class="flex gap-2 items-start cursor-pointer"><input type="checkbox" name="directory_consent" class="mt-1"><span class="text-sm"><b>Would you like to share your details in the Alumni Relations website directory?</b><br><span class="text-xs text-gray-600">Name, faculty, batch visible in Directory</span></span></label></div>
+
+<div class="p-3 bg-yellow-50 rounded-xl border border-yellow-200"><label class="text-sm font-semibold">Email OTP Verification *</label><div class="flex gap-2 mt-2 flex-wrap"><button type="button" onclick="sendOTP()" class="px-4 py-2 bg-[#7a0a0a] text-white rounded-full text-xs font-bold">Send OTP</button><input id="otpInput" class="flex-1 min-w- p-2 border rounded-lg text-sm" placeholder="Enter OTP"><button type="button" onclick="verifyOTP()" id="verifyOtpBtn" class="px-4 py-2 border border-[#7a0a0a] text-[#7a0a0a] rounded-full text-xs font-bold">Verify</button></div><p id="otpStatus" class="text-xs mt-1 hidden"></p></div>
+
+<div class="flex gap-3 mt-4">
+<button type="button" onclick="backToContact()" class="px-5 py-2.5 border rounded-full text-sm">← Back</button>
+<button type="button" onclick="submitBasic()" class="px-6 py-2.5 border-2 border-[#7a0a0a] text-[#7a0a0a] rounded-full text-sm font-bold">Submit</button>
+<button type="button" onclick="goToMoreDetails()" class="px-6 py-2.5 bg-[#7a0a0a] text-white rounded-full text-sm font-bold">More Details →</button>
+</div>
+</div>
+</div>
+
+<!-- SECTION 4: More Details -->
+<div id="sec-more" class="form-section hidden">
+<h3 class="font-bold text-[#7a0a0a] text-lg">More Details - Professional & Alumni Network</h3>
+<p class="text-xs text-gray-500 mb-4">You can edit these later after login.</p>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div><label class="text-sm font-semibold">Current Country of Residence *</label><select name="current_country" id="countrySelect" class="w-full mt-1 p-3 border rounded-xl bg-gray-50"><option value="">Select country</option></select></div>
+<div><label class="text-sm font-semibold">LinkedIn Profile</label><input name="linkedin" class="w-full mt-1 p-3 border rounded-xl bg-gray-50" placeholder="https://linkedin.com/in/..."></div>
+<div class="md:col-span-2"><label class="text-sm font-semibold">Current Profession / Organization *</label><input name="profession_org" class="w-full mt-1 p-3 border rounded-xl bg-gray-50" placeholder="e.g. Software Engineer at Virtusa, Colombo"></div>
+<div class="md:col-span-2"><label class="text-sm font-semibold">Alumni Association Membership (If any)</label><input name="alumni_membership" class="w-full mt-1 p-3 border rounded-xl bg-gray-50" placeholder="e.g. Member of Engineering Alumni Association 2020"></div>
+
+<div class="md:col-span-2 mt-2">
+<label class="text-sm font-bold">Are you willing to be contacted by? *</label>
+<div class="mt-2 space-y-2 p-3 bg-gray-50 rounded-xl border">
+<label class="flex items-center gap-2 text-sm"><input type="checkbox" name="contact_by[]" value="students_mentoring"> Students for mentoring</label>
+<label class="flex items-center gap-2 text-sm"><input type="checkbox" name="contact_by[]" value="university_events"> University for events</label>
+<label class="flex items-center gap-2 text-sm"><input type="checkbox" name="contact_by[]" value="other_alumni"> Other alumni</label>
+</div>
+</div>
+
+<div class="md:col-span-2">
+<label class="text-sm font-bold">How would you like to contribute? *</label>
+<div class="mt-2 grid grid-cols-1 md:grid-cols-2 gap-2 p-3 bg-gray-50 rounded-xl border">
+<label class="flex items-center gap-2 text-sm"><input type="checkbox" name="contribute[]" value="mentoring"> Mentoring</label>
+<label class="flex items-center gap-2 text-sm"><input type="checkbox" name="contribute[]" value="guest_lecture"> Guest lecture</label>
+<label class="flex items-center gap-2 text-sm"><input type="checkbox" name="contribute[]" value="internship"> Internship</label>
+<label class="flex items-center gap-2 text-sm"><input type="checkbox" name="contribute[]" value="donation"> Donation (Cash or financial donations are not accepted.)</label>
+<label class="flex items-center gap-2 text-sm"><input type="checkbox" name="contribute[]" value="volunteering"> Volunteering</label>
+<label class="flex items-center gap-2 text-sm"><input type="checkbox" name="contribute[]" value="networking"> Networking</label>
+<label class="flex items-center gap-2 text-sm"><input type="checkbox" name="contribute[]" value="no_time"> No time now</label>
+</div>
+</div>
+</div>
+
+<div class="flex gap-3 mt-6">
+<button type="button" onclick="backToAcademic()" class="px-6 py-3 border rounded-full font-bold">← Back</button>
+<button type="submit" class="flex-1 py-3 bg-[#7a0a0a] text-white rounded-full font-bold">Final Submit →</button>
+</div>
+</div>
+
+</form>
+</div>
 </section>
 
-<footer class="bg-[#1a1a1a] text-white/60 py-8 px-6 text-sm mt-16">
-  <div class="max-w-7xl mx-auto">University of Peradeniya - Peradeniya 20400 - Alumni Relations Office - Reg No: ARO-YYYY-FAC-XXXX</div>
-</footer>
-
 <script>
-const urlParams = new URLSearchParams(window.location.search);
-const faculty = urlParams.get('faculty');
-if(faculty) document.getElementById('fac').innerText = faculty;
+const urlParams = new URLSearchParams(location.search);
+const fac = urlParams.get('faculty') || localStorage.getItem('selected_faculty');
+if(fac){ document.getElementById('fac').innerText=fac; document.getElementById('faculty_input').value=fac; localStorage.setItem('selected_faculty',fac);}else if(!localStorage.getItem('selected_faculty')){ location.href='register_faculty.html'; }
+
+function goToEmail(){
+  if(!document.getElementById('fullName').value ||!document.getElementById('prefName').value){ alert('Fill both names'); return; }
+  document.getElementById('sec-name').classList.add('hidden');
+  document.getElementById('sec-contact').classList.remove('hidden');
+  document.getElementById('s1').classList.add('opacity-50'); document.getElementById('s1').querySelector('div').className='w-7 h-7 bg-green-600 text-white rounded-full flex items-center justify-center font-bold';
+  document.getElementById('l1').className='w-10 h-0.5 bg-green-600';
+  document.getElementById('s2').classList.remove('opacity-50'); document.getElementById('s2').querySelector('div').className='w-7 h-7 bg-[#7a0a0a] text-white rounded-full flex items-center justify-center font-bold';
+  document.getElementById('emailInput').focus();
+}
+function backToName(){ document.getElementById('sec-contact').classList.add('hidden'); document.getElementById('sec-name').classList.remove('hidden'); document.getElementById('s2').classList.add('opacity-50'); document.getElementById('s1').classList.remove('opacity-50'); }
+function goToAcademic(){
+  if(!document.getElementById('emailInput').value ||!document.getElementById('phoneInput').value){ alert('Fill email and phone'); return; }
+  document.getElementById('sec-contact').classList.add('hidden'); document.getElementById('sec-academic').classList.remove('hidden');
+  document.getElementById('l2').className='w-10 h-0.5 bg-green-600'; document.getElementById('s2').querySelector('div').className='w-7 h-7 bg-green-600 text-white rounded-full flex items-center justify-center font-bold';
+  document.getElementById('s3').classList.remove('opacity-50'); document.getElementById('s3').querySelector('div').className='w-7 h-7 bg-[#7a0a0a] text-white rounded-full flex items-center justify-center font-bold';
+}
+function backToContact(){ document.getElementById('sec-academic').classList.add('hidden'); document.getElementById('sec-contact').classList.remove('hidden'); }
+function backToAcademic(){ document.getElementById('sec-more').classList.add('hidden'); document.getElementById('sec-academic').classList.remove('hidden'); }
+function toggleVerification(){ const sel=document.querySelector('input[name="rememberRegNo"]:checked'); if(!sel)return; if(sel.value==='yes'){ document.getElementById('regNoSection').classList.remove('hidden'); document.getElementById('degreeSection').classList.add('hidden'); } else{ document.getElementById('regNoSection').classList.add('hidden'); document.getElementById('degreeSection').classList.remove('hidden'); } }
+
+let selectedYear=null;
+function showDecade(start){
+  document.querySelectorAll('.decade-tab').forEach(b=>{ b.classList.remove('bg-[#7a0a0a]','text-white'); b.classList.add('bg-gray-100'); });
+  const a=document.querySelector(`.decade-tab[data-decade="${start}"]`); if(a){a.classList.remove('bg-gray-100'); a.classList.add('bg-[#7a0a0a]','text-white');}
+  const grid=document.getElementById('yearGrid'); grid.innerHTML=''; const end=start===2020?2026:start+9;
+  for(let y=start;y<=end;y++){ const btn=document.createElement('button'); btn.type='button'; btn.textContent=y; btn.className='year-btn p-2 border rounded-xl text-xs font-bold hover:bg-[#7a0a0a] hover:text-white '+(selectedYear===y?'bg-[#7a0a0a] text-white':'bg-gray-50'); btn.onclick=()=>selectYear(y); grid.appendChild(btn); }
+}
+function selectYear(y){ selectedYear=y; document.getElementById('grad_year_input').value=y; document.getElementById('selectedYearDisplay').classList.remove('hidden'); document.getElementById('selectedYearText').innerText=y; document.getElementById('yearSearch').value=y; const dec=y>=2020?2020:Math.floor(y/10)*10; showDecade(dec); }
+function jumpToYear(v){ const y=parseInt(v); if(y>=1950&&y<=2026){ selectYear(y);} }
+showDecade(2010);
+
+const countries=["Sri Lanka","India","USA","United Kingdom","Australia","Canada","Germany","France","Japan","China","Singapore","Malaysia","UAE","Qatar","Saudi Arabia","New Zealand","Italy","Netherlands","Sweden","Switzerland","Other"];
+const sel=document.getElementById('countrySelect'); countries.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
+
+let otpVerified=false;
+function sendOTP(){ const e=document.getElementById('emailInput').value; if(!e){alert('Enter email');return;} document.getElementById('otpStatus').classList.remove('hidden'); document.getElementById('otpStatus').innerText='OTP sent to '+e+' Demo:123456'; document.getElementById('otpStatus').className='text-xs mt-1 text-green-700 font-bold'; }
+function verifyOTP(){ const o=document.getElementById('otpInput').value; if(o==='123456'||o.length===6){ otpVerified=true; document.getElementById('otpStatus').innerText='✓ Verified'; document.getElementById('verifyOtpBtn').innerText='Verified'; document.getElementById('verifyOtpBtn').className='px-4 py-2 bg-green-600 text-white rounded-full text-xs font-bold'; }else{ document.getElementById('otpStatus').innerText='Invalid try 123456'; document.getElementById('otpStatus').className='text-xs mt-1 text-red-600'; } }
+function submitBasic(){ if(!otpVerified){alert('Verify OTP');return;} const fd=new FormData(document.getElementById('alumniForm')); localStorage.setItem('alumni_basic',JSON.stringify(Object.fromEntries(fd))); alert('Basic saved! MySQL: INSERT INTO alumni_basic'); location.href='Login.html'; }
+function goToMoreDetails(){
+  if(!otpVerified){alert('Verify OTP');return;}
+  if(!document.getElementById('grad_year_input').value){alert('Select graduation year');return;}
+  document.getElementById('sec-academic').classList.add('hidden'); document.getElementById('sec-more').classList.remove('hidden');
+  document.getElementById('l3').className='w-10 h-0.5 bg-green-600'; document.getElementById('s3').querySelector('div').className='w-7 h-7 bg-green-600 text-white rounded-full flex items-center justify-center font-bold';
+  document.getElementById('s4').classList.remove('opacity-50'); document.getElementById('s4').querySelector('div').className='w-7 h-7 bg-[#7a0a0a] text-white rounded-full flex items-center justify-center font-bold';
+  const fd=new FormData(document.getElementById('alumniForm')); localStorage.setItem('alumni_basic',JSON.stringify(Object.fromEntries(fd))); window.scrollTo(0,0);
+}
+document.getElementById('alumniForm').addEventListener('submit',function(e){
+  e.preventDefault();
+  const basic=JSON.parse(localStorage.getItem('alumni_basic')||'{}');
+  const all={...basic,...Object.fromEntries(new FormData(this))};
+  all.contact_by = Array.from(document.querySelectorAll('input[name="contact_by[]"]:checked')).map(c=>c.value);
+  all.contribute = Array.from(document.querySelectorAll('input[name="contribute[]"]:checked')).map(c=>c.value);
+  localStorage.setItem('alumni_full',JSON.stringify(all));
+  alert('Final Submit! Country: '+all.current_country+' Contribute: '+all.contribute.join(', '));
+  location.href='Login.html';
+});
 </script>
 </body>
 </html>
