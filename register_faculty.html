@@ -16,13 +16,12 @@
 <header class="bg-white shadow-sm">
   <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
     <div class="flex items-center gap-3">
-      <!-- UOP LOGO CIRCLE -->
       <div class="w-10 h-10 rounded-full overflow-hidden bg-white border-2 border-[#7a0a0a] flex-shrink-0">
         <img src="images/uop-logo.png" class="w-full h-full object-cover rounded-full" alt="UOP Logo">
       </div>
       <div>
         <div class="font-bold text-[#7a0a0a]">University of Peradeniya</div>
-        <div class="text- text-gray-500">Global Alumni Connect</div>
+        <div class="text-[11px] text-gray-500">Global Alumni Connect</div>
       </div>
     </div>
     <nav class="flex gap-6 text-sm font-medium items-center">
@@ -36,35 +35,174 @@
     </nav>
   </div>
 </header>
+
 <section class="max-w-3xl mx-auto px-6 py-16">
   <div class="text-center mb-10">
     <h1 class="text-3xl font-bold text-[#7a0a0a]">Select Your Faculty</h1>
     <p class="text-gray-500 mt-2">Pick your faculty to proceed to registration</p>
-  </div>
-  <div class="bg-white rounded-2xl shadow-sm border p-8">
-    <label class="text-sm font-semibold">Faculty *</label>
-    <select id="facultySelect" class="w-full mt-2 p-4 border-2 border-[#7a0a0a]/20 rounded-xl bg-gray-50 text-base font-medium focus:border-[#7a0a0a] outline-none">
-      <option value="">-- Select Your Faculty --</option>
-      <option value="Engineering">Faculty of Engineering</option>
-      <option value="Arts">Faculty of Arts</option>
-      <option value="Science">Faculty of Science</option>
-      <option value="Medicine">Faculty of Medicine</option>
-      <option value="Agriculture">Faculty of Agriculture</option>
-      <option value="Management">Faculty of Management</option>
-      <option value="Veterinary">Faculty of Veterinary Medicine & Animal Science</option>
-      <option value="Dental">Faculty of Dental Sciences</option>
-      <option value="Allied Health">Faculty of Allied Health Sciences</option>
-    </select>
-    <div class="mt-6 flex gap-3">
-      <a href="index.html" class="px-6 py-3 border rounded-full">Back</a>
-      <button onclick="goToForm()" class="flex-1 py-3 bg-[#7a0a0a] text-white rounded-full font-bold">Continue to Registration Form →</button>
-    </div>
-    <div class="mt-6 text-xs text-gray-500 text-center">Simple dropdown - not complicated - pick faculty and continue</div>
+  <!-- Faculty Registration Section -->
+<section class="max-w-7xl mx-auto px-6 py-16">
+
+ <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+    <!-- Engineering -->
+    <a href="register_form.html?faculty=Engineering"
+       class="bg-white rounded-2xl overflow-hidden shadow-sm border hover:shadow-lg transition">
+
+      <img
+        src="images/faculties/engineering.jpg"
+        class="w-full h-48 object-cover"
+        alt="Faculty of Engineering">
+
+      <div class="p-4">
+        <h3 class="font-bold text-[#7a0a0a]">
+          Faculty of Engineering
+        </h3>
+      </div>
+    </a>
+
+
+    <!-- Arts -->
+    <a href="register_form.html?faculty=Arts"
+       class="bg-white rounded-2xl overflow-hidden shadow-sm border hover:shadow-lg transition">
+
+      <img
+        src="images/faculties/arts.jpg"
+        class="w-full h-48 object-cover"
+        alt="Faculty of Arts">
+
+      <div class="p-4">
+        <h3 class="font-bold text-[#7a0a0a]">
+          Faculty of Arts
+        </h3>
+      </div>
+    </a>
+
+
+    <!-- Science -->
+    <a href="register_form.html?faculty=Science"
+       class="bg-white rounded-2xl overflow-hidden shadow-sm border hover:shadow-lg transition">
+
+      <img
+        src="images/faculties/science.jpg"
+        class="w-full h-48 object-cover"
+        alt="Faculty of Science">
+
+      <div class="p-4">
+        <h3 class="font-bold text-[#7a0a0a]">
+          Faculty of Science
+        </h3>
+      </div>
+    </a>
+
+
+    <!-- Medicine -->
+    <a href="register_form.html?faculty=Medicine"
+       class="bg-white rounded-2xl overflow-hidden shadow-sm border hover:shadow-lg transition">
+
+      <img
+        src="images/faculties/medicine.jpg"
+        class="w-full h-48 object-cover"
+        alt="Faculty of Medicine">
+
+      <div class="p-4">
+        <h3 class="font-bold text-[#7a0a0a]">
+          Faculty of Medicine
+        </h3>
+      </div>
+    </a>
+
+
+    <!-- Agriculture -->
+    <a href="register_form.html?faculty=Agriculture"
+       class="bg-white rounded-2xl overflow-hidden shadow-sm border hover:shadow-lg transition">
+
+      <img
+        src="images/faculties/agriculture.jpg"
+        class="w-full h-48 object-cover"
+        alt="Faculty of Agriculture">
+
+      <div class="p-4">
+        <h3 class="font-bold text-[#7a0a0a]">
+          Faculty of Agriculture
+	</h3>
+
+      </div>
+    </a>
+
+
+    <!-- Management -->
+    <a href="register_form.html?faculty=Management"
+       class="bg-white rounded-2xl overflow-hidden shadow-sm border hover:shadow-lg transition">
+
+      <img
+        src="images/faculties/management.jpg"
+        class="w-full h-48 object-cover"
+        alt="Faculty of Management">
+
+      <div class="p-4">
+        <h3 class="font-bold text-[#7a0a0a]">
+          Faculty of Management
+        </h3>
+      </div>
+    </a>
+
+
+    <!-- Veterinary -->
+    <a href="register_form.html?faculty=Veterinary"
+       class="bg-white rounded-2xl overflow-hidden shadow-sm border hover:shadow-lg transition">
+
+      <img
+        src="images/faculties/veterinary.jpg"
+        class="w-full h-48 object-cover"
+        alt="Faculty of Veterinary Medicine & Animal Science">
+
+      <div class="p-4">
+        <h3 class="font-bold text-[#7a0a0a]">
+          Faculty of Veterinary Medicine & Animal Science
+        </h3>
+      </div>
+    </a>
+
+
+    <!-- Dental -->
+    <a href="register_form.html?faculty=Dental"
+       class="bg-white rounded-2xl overflow-hidden shadow-sm border hover:shadow-lg transition">
+
+      <img
+        src="images/faculties/dental.jpg"
+        class="w-full h-48 object-cover"
+        alt="Faculty of Dental Sciences">
+
+      <div class="p-4">
+        <h3 class="font-bold text-[#7a0a0a]">
+          Faculty of Dental Sciences
+        </h3>
+      </div>
+    </a>
+
+
+    <!-- Allied Health -->
+    <a href="register_form.html?faculty=Allied Health"
+       class="bg-white rounded-2xl overflow-hidden shadow-sm border hover:shadow-lg transition">
+
+      <img
+        src="images/faculties/allied-health.jpg"
+        class="w-full h-48 object-cover"
+        alt="Faculty of Allied Health Sciences">
+
+      <div class="p-4">
+        <h3 class="font-bold text-[#7a0a0a]">
+          Faculty of Allied Health Sciences
+        </h3>
+      </div>
+    </a>
+
   </div>
 </section>
 
 <footer class="bg-[#1a1a1a] text-white/60 py-8 px-6 text-sm mt-16">
-  <div class="max-w-7xl mx-auto">University of Peradeniya - Peradeniya 20400 - Alumni Relations Office - Reg No: ARO-YYYY-FAC-XXXX</div>
+  <div class="max-w-7xl mx-auto">University of Peradeniya - Peradeniya 20400 - AAUP - Reg No: AAUP-YYYY-FAC-XXXX</div>
 </footer>
 
 <script>
