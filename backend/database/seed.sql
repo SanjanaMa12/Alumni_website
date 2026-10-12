@@ -1,9 +1,11 @@
 -- Seed data, taken from the original static site.
 -- Run after schema.sql:  mysql -u root -p aro_alumni < backend/database/seed.sql
 --
--- Demo accounts (password for all: Password123) - delete these before going live.
---   alumni@demo.lk   (alumni, verified)
---   student@demo.lk  (student)
+-- Demo accounts - delete these before going live. Log in with email + OTP
+-- (with 'debug' => true in config.php the code is shown on screen):
+--   alumni@demo.lk          Alumni Login (verified)
+--   pending@demo.lk         Alumni Login is refused: still pending verification
+-- Students need no seed: any @pdn.ac.lk / @<faculty>.pdn.ac.lk email can use Student Login.
 
 USE aro_alumni;
 
@@ -54,14 +56,12 @@ INSERT INTO people (group_key, name, designation, photo, sort_order) VALUES
   ('university_advisory', 'Name of Representative',             'Designation',                  NULL, 2),
   ('aro',                 'Name of Alumni Relations Officer',   'Alumni Relations Officer',     NULL, 1);
 
-INSERT INTO users (role, email, password_hash, full_name, preferred_name, phone, faculty_id, grad_year, reg_no,
+INSERT INTO users (role, email, full_name, preferred_name, phone, faculty_id, grad_year, reg_no,
                    directory_consent, current_country, profession_org, contact_by, contribute, verification_status) VALUES
-  ('alumni', 'alumni@demo.lk', '$2y$10$/81qI85OEdP1oRmYgq8D8uNxQrIj7ahYTX89oZgCzbJDjNPbXcLCq',
-   'Kasun Sampath Perera', 'Kasun', '+94 77 000 0000',
+  ('alumni', 'alumni@demo.lk', 'Kasun Sampath Perera', 'Kasun', '+94 77 000 0000',
    (SELECT id FROM faculties WHERE slug = 'engineering'), 2016, 'E/12/123',
    1, 'Sri Lanka', 'Software Engineer at Virtusa, Colombo',
    'students_mentoring,other_alumni', 'mentoring,guest_lecture', 'verified'),
-  ('student', 'student@demo.lk', '$2y$10$/81qI85OEdP1oRmYgq8D8uNxQrIj7ahYTX89oZgCzbJDjNPbXcLCq',
-   'Nimali Fernando', 'Nimali', NULL,
-   (SELECT id FROM faculties WHERE slug = 'science'), NULL, 'S/21/045',
-   0, 'Sri Lanka', NULL, NULL, NULL, 'verified');
+  ('alumni', 'pending@demo.lk', 'Nimal Jayasinghe', 'Nimal', '+94 71 000 0000',
+   (SELECT id FROM faculties WHERE slug = 'arts'), 2008, NULL,
+   1, 'Australia', 'Lecturer', 'other_alumni', 'networking', 'pending');

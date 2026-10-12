@@ -79,13 +79,29 @@ function validate_more_details(bool $required): array
     return [$data, $errors];
 }
 
-function validate_password(string $password): ?string
+/** Alumni may log in only once the ARO has verified them; students and admins always can. */
+function user_can_log_in(array $user): bool
 {
-    if (strlen($password) < 8) {
-        return 'Password must be at least 8 characters.';
+    return $user['role'] !== 'alumni' || $user['verification_status'] === 'verified';
+}
+
+/** True for addresses on a configured university domain or any of its subdomains. */
+function is_student_email(string $email): bool
+{
+    $domain = strtolower(substr(strrchr($email, '@') ?: '', 1));
+    foreach (config('student_email_domains', []) as $allowed) {
+        $allowed = strtolower(ltrim($allowed, '@.'));
+        if ($domain === $allowed || str_ends_with($domain, '.' . $allowed)) {
+            return true;
+        }
     }
-    if (!preg_match('/[A-Za-z]/', $password) || !preg_match('/\d/', $password)) {
-        return 'Password must contain both letters and numbers.';
-    }
-    return null;
+    return false;
+}
+
+function find_user_by_email(string $email): ?array
+{
+    $stmt = db()->prepare('SELECT id FROM users WHERE email = ?');
+    $stmt->execute([$email]);
+    $id = $stmt->fetchColumn();
+    return $id ? find_user((int) $id) : null;
 }

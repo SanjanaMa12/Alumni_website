@@ -1,148 +1,147 @@
 <?php
 declare(strict_types=1);
 
+const LOGIN_ROLES = ['alumni', 'student'];
+
 function normalize_email(string $email): string
 {
     return strtolower(trim($email));
 }
 
-function email_is_registered(string $email): bool
-{
-    $stmt = db()->prepare('SELECT 1 FROM users WHERE email = ?');
-    $stmt->execute([$email]);
-    return (bool) $stmt->fetchColumn();
-}
-
-function log_in_user(int $userId): void
-{
-    session_regenerate_id(true);
-    $_SESSION['user_id'] = $userId;
-}
-
-// GET /auth/me
-function handle_me(): array
-{
-    $id = current_user_id();
-    $user = $id !== null ? find_user($id) : null;
-    if ($id !== null && $user === null) {
-        // Account was deleted while the session was alive.
-        unset($_SESSION['user_id']);
-    }
-    return ['user' => $user ? user_payload($user) : null];
-}
-
-// POST /auth/login  { email, password, role }
-function handle_login(): array
-{
-    $email = normalize_email(str_input('email', 190));
-    $password = password_input('password');
-    $role = str_input('role', 20);
-
-    if ($email === '' || $password === '') {
-        throw new HttpError(422, 'Enter your email and password.');
-    }
-
-    $stmt = db()->prepare('SELECT id, role, password_hash FROM users WHERE email = ?');
-    $stmt->execute([$email]);
-    $row = $stmt->fetch();
-
-    if (!$row || !password_verify($password, $row['password_hash'])) {
-        throw new HttpError(401, 'Incorrect email or password.');
-    }
-    if (in_array($role, ['alumni', 'student'], true) && $row['role'] !== $role && $row['role'] !== 'admin') {
-        $correct = $row['role'] === 'student' ? 'Student Login' : 'Alumni Login';
-        throw new HttpError(403, "This account is registered as {$row['role']}. Please use {$correct}.");
-    }
-
-    if (password_needs_rehash($row['password_hash'], PASSWORD_DEFAULT)) {
-        db()->prepare('UPDATE users SET password_hash = ? WHERE id = ?')
-            ->execute([password_hash($password, PASSWORD_DEFAULT), $row['id']]);
-    }
-
-    log_in_user((int) $row['id']);
-    return ['user' => user_payload(find_user((int) $row['id']))];
-}
-
-// POST /auth/logout
-function handle_logout(): array
-{
-    $_SESSION = [];
-    session_regenerate_id(true);
-    return ['ok' => true];
-}
-
-// POST /auth/otp/send  { email }
-function handle_send_otp(): array
+function email_input(): string
 {
     $email = normalize_email(str_input('email', 190));
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         throw new HttpError(422, 'Enter a valid email address.', ['email' => 'Enter a valid email address.']);
     }
-    if (email_is_registered($email)) {
-        throw new HttpError(409, 'This email is already registered. Please log in instead.', ['email' => 'Already registered.']);
-    }
-
-    $ttl = (int) config('otp.ttl_minutes', 10) * 60;
-    $resend = (int) config('otp.resend_seconds', 60);
-
-    $stmt = db()->prepare('SELECT expires_at FROM email_verifications WHERE email = ? ORDER BY id DESC LIMIT 1');
-    $stmt->execute([$email]);
-    $last = $stmt->fetchColumn();
-    if ($last) {
-        $wait = strtotime($last) - $ttl + $resend - time();
-        if ($wait > 0) {
-            throw new HttpError(429, "Please wait {$wait} seconds before requesting another code.");
-        }
-    }
-
-    $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-
-    db()->prepare('DELETE FROM email_verifications WHERE email = ?')->execute([$email]);
-    db()->prepare('INSERT INTO email_verifications (email, code_hash, expires_at) VALUES (?, ?, ?)')
-        ->execute([$email, password_hash($code, PASSWORD_DEFAULT), date('Y-m-d H:i:s', time() + $ttl)]);
-
-    $minutes = (int) config('otp.ttl_minutes', 10);
-    $sent = @mail(
-        $email,
-        'Your University of Peradeniya Alumni verification code',
-        "Your verification code is: {$code}\n\nIt expires in {$minutes} minutes.\n\nAlumni Relations Office, University of Peradeniya",
-        'From: ' . config('mail.from')
-    );
-
-    $response = ['ok' => true, 'message' => "We sent a 6-digit code to {$email}."];
-    if (config('debug')) {
-        // Development only: lets you register without a working mail server.
-        $response['dev_code'] = $code;
-    } elseif (!$sent) {
-        throw new HttpError(500, 'We could not send the verification email. Please try again later.');
-    }
-    return $response;
+    return $email;
 }
 
-// POST /auth/otp/verify  { email, code }
-function handle_verify_otp(): array
+function role_input(): string
 {
-    $email = normalize_email(str_input('email', 190));
-    $code = preg_replace('/\D/', '', str_input('code', 10));
-
-    $stmt = db()->prepare('SELECT * FROM email_verifications WHERE email = ? ORDER BY id DESC LIMIT 1');
-    $stmt->execute([$email]);
-    $row = $stmt->fetch();
-
-    if (!$row || strtotime($row['expires_at']) < time()) {
-        throw new HttpError(400, 'This code has expired. Please request a new one.');
+    $role = str_input('role', 20);
+    if (!in_array($role, LOGIN_ROLES, true)) {
+        throw new HttpError(422, 'Choose Alumni Login or Student Login.');
     }
-    if ((int) $row['attempts'] >= (int) config('otp.max_attempts', 5)) {
-        throw new HttpError(429, 'Too many incorrect attempts. Please request a new code.');
-    }
-    if (!password_verify($code, $row['code_hash'])) {
-        db()->prepare('UPDATE email_verifications SET attempts = attempts + 1 WHERE id = ?')->execute([$row['id']]);
-        throw new HttpError(400, 'Incorrect code. Please check your email and try again.');
+    return $role;
+}
+
+function code_input(): string
+{
+    return preg_replace('/\D/', '', str_input('code', 10));
+}
+
+/**
+ * Decides whether this email may log in on the chosen tab.
+ * Returns the existing account, or null for a student logging in for the first time.
+ *   Alumni tab:  the email must belong to a VERIFIED alumni account.
+ *   Student tab: the email must be on a university domain (config: student_email_domains).
+ */
+function login_account(string $email, string $role): ?array
+{
+    $user = find_user_by_email($email);
+
+    if ($user && $user['role'] === 'admin') {
+        return $user;
     }
 
-    db()->prepare('DELETE FROM email_verifications WHERE email = ?')->execute([$email]);
-    $_SESSION['verified_email'] = $email;
-    return ['ok' => true, 'verified' => true];
+    if ($role === 'alumni') {
+        if (!$user) {
+            throw new HttpError(404, 'No alumni account found for this email. Please register first.', ['email' => 'Not registered.']);
+        }
+        if ($user['role'] === 'student') {
+            throw new HttpError(403, 'This is a student account. Please use Student Login.');
+        }
+        if ($user['verification_status'] === 'pending') {
+            throw new HttpError(403, 'Your registration is still being verified by the Alumni Relations Office. You can log in once it is approved.');
+        }
+        if ($user['verification_status'] === 'rejected') {
+            throw new HttpError(403, 'We could not verify your alumni record. Please contact aro@pdn.ac.lk.');
+        }
+        return $user;
+    }
+
+    if ($user && $user['role'] === 'alumni') {
+        throw new HttpError(403, 'This email is registered as an alumni account. Please use Alumni Login.');
+    }
+    if (!is_student_email($email)) {
+        $domains = implode(', ', array_map(fn ($d) => '@' . ltrim($d, '@'), config('student_email_domains', [])));
+        throw new HttpError(422, "Student Login needs your university email ({$domains} or a faculty address such as @sci.pdn.ac.lk).", ['email' => 'Use your university email.']);
+    }
+    return $user;
+}
+
+/** First Student Login: create the account, named from the email until they edit it. */
+function create_student(string $email): array
+{
+    $local = strstr($email, '@', true) ?: $email;
+    $name = mb_substr(ucwords(strtolower(trim(preg_replace('/[._-]+/', ' ', $local)))), 0, 100);
+
+    db()->prepare(
+        "INSERT INTO users (role, email, full_name, preferred_name, verification_status) VALUES ('student', ?, ?, ?, 'verified')"
+    )->execute([$email, $name, $name]);
+
+    return find_user((int) db()->lastInsertId());
+}
+
+// GET /auth/me
+function handle_me(): array
+{
+    $user = current_user();
+    return ['user' => $user ? user_payload($user) : null];
+}
+
+// POST /auth/login/otp  { email, role }  - step 1: email a login code
+function handle_login_send_otp(): array
+{
+    $email = email_input();
+    login_account($email, role_input());
+    return otp_issue($email, 'login');
+}
+
+// POST /auth/login/verify  { email, role, code }  - step 2: check the code and log in
+function handle_login_verify(): array
+{
+    $email = email_input();
+    // Checked again: the account may have changed since the code was sent.
+    $user = login_account($email, role_input());
+    otp_consume($email, 'login', code_input());
+
+    $user = $user ?? create_student($email);
+    issue_auth_token($user);
+    return ['user' => user_payload($user)];
+}
+
+// POST /auth/logout
+function handle_logout(): array
+{
+    clear_auth_cookie();
+    return ['ok' => true];
+}
+
+// POST /auth/register/otp  { email }  - prove the address belongs to the person registering
+function handle_register_send_otp(): array
+{
+    $email = email_input();
+    if (find_user_by_email($email)) {
+        throw new HttpError(409, 'This email is already registered. Please log in instead.', ['email' => 'Already registered.']);
+    }
+    return otp_issue($email, 'register');
+}
+
+// POST /auth/register/verify  { email, code }
+// Returns a short-lived registration token that must be sent with the registration form.
+function handle_register_verify(): array
+{
+    $email = email_input();
+    otp_consume($email, 'register', code_input());
+
+    $ttl = (int) config('jwt.registration_ttl_minutes', 30) * 60;
+    return [
+        'ok'                 => true,
+        'verified'           => true,
+        'registration_token' => jwt_encode(['purpose' => 'register', 'email' => $email], $ttl),
+    ];
 }
 
 /** Validates and stores an uploaded degree certificate. Returns the stored file name. */
@@ -186,11 +185,12 @@ function handle_register(): array
     $errors = [];
 
     $email = normalize_email(str_input('email', 190));
+    $proof = jwt_decode(str_input('registration_token', 2000), 'register');
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errors['email'] = 'Enter a valid email address.';
-    } elseif (($_SESSION['verified_email'] ?? null) !== $email) {
+    } elseif (!$proof || $proof['email'] !== $email) {
         $errors['email'] = 'Please verify this email with the OTP code first.';
-    } elseif (email_is_registered($email)) {
+    } elseif (find_user_by_email($email)) {
         $errors['email'] = 'This email is already registered.';
     }
 
@@ -212,11 +212,6 @@ function handle_register(): array
     }
     if (!preg_match('/^\+?[0-9 ()-]{7,20}$/', $phone)) {
         $errors['phone'] = 'Enter a valid phone number.';
-    }
-
-    $password = password_input('password');
-    if ($passwordError = validate_password($password)) {
-        $errors['password'] = $passwordError;
     }
 
     $gradYear = (int) str_input('grad_year', 4);
@@ -246,13 +241,12 @@ function handle_register(): array
 
     try {
         db()->prepare(
-            'INSERT INTO users (role, email, password_hash, full_name, preferred_name, phone, faculty_id, grad_year,
+            'INSERT INTO users (role, email, full_name, preferred_name, phone, faculty_id, grad_year,
                                 reg_no, degree_cert_path, directory_consent, current_country, linkedin,
                                 profession_org, alumni_membership, contact_by, contribute)
-             VALUES (\'alumni\', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+             VALUES (\'alumni\', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         )->execute([
             $email,
-            password_hash($password, PASSWORD_DEFAULT),
             $fullName,
             $preferredName,
             $phone,
@@ -278,9 +272,9 @@ function handle_register(): array
         throw $e;
     }
 
-    $userId = (int) db()->lastInsertId();
-    unset($_SESSION['verified_email']);
-    log_in_user($userId);
-
-    return ['user' => user_payload(find_user($userId))];
+    // No automatic login: alumni can log in once the ARO has verified them.
+    return [
+        'ok'      => true,
+        'message' => 'Registration received. The Alumni Relations Office will verify your details, and then you can log in with your email.',
+    ];
 }

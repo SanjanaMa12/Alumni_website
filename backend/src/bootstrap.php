@@ -57,12 +57,9 @@ function db(): PDO
     return $pdo;
 }
 
-session_set_cookie_params([
-    'lifetime' => 0,
-    'path'     => '/',
-    'httponly' => true,
-    'samesite' => 'Lax',
-    'secure'   => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
-]);
-session_name('aro_session');
-session_start();
+require __DIR__ . '/jwt.php';
+
+$secret = (string) config('jwt.secret', '');
+if (strlen($secret) < 32 || str_starts_with($secret, 'CHANGE-ME')) {
+    json_response(['error' => "Set 'jwt.secret' in backend/config/config.php to a random string of at least 32 characters."], 500);
+}

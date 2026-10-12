@@ -5,7 +5,18 @@ declare(strict_types=1);
 function handle_update_profile(): array
 {
     $userId = require_login();
+    $user = current_user();
     $errors = [];
+
+    // Students' accounts are named from their email on first login, so they may fix it.
+    // Alumni names come from the verified record and are changed by the ARO only.
+    $fullName = $user['full_name'];
+    if ($user['role'] === 'student') {
+        $fullName = str_input('full_name', 200);
+        if ($fullName === '') {
+            $errors['full_name'] = 'Enter your full name.';
+        }
+    }
 
     $preferredName = str_input('preferred_name', 100);
     $phone = str_input('phone', 30);
@@ -25,10 +36,11 @@ function handle_update_profile(): array
 
     db()->prepare(
         'UPDATE users
-            SET preferred_name = ?, phone = ?, directory_consent = ?, current_country = ?, linkedin = ?,
+            SET full_name = ?, preferred_name = ?, phone = ?, directory_consent = ?, current_country = ?, linkedin = ?,
                 profession_org = ?, alumni_membership = ?, contact_by = ?, contribute = ?
           WHERE id = ?'
     )->execute([
+        $fullName,
         $preferredName,
         $phone ?: null,
         bool_input('directory_consent') ? 1 : 0,
@@ -42,27 +54,4 @@ function handle_update_profile(): array
     ]);
 
     return ['user' => user_payload(find_user($userId))];
-}
-
-// POST /profile/password  { current_password, new_password }
-function handle_change_password(): array
-{
-    $userId = require_login();
-
-    $stmt = db()->prepare('SELECT password_hash FROM users WHERE id = ?');
-    $stmt->execute([$userId]);
-    if (!password_verify(password_input('current_password'), (string) $stmt->fetchColumn())) {
-        throw new HttpError(422, 'Current password is incorrect.', ['current_password' => 'Incorrect password.']);
-    }
-
-    $new = password_input('new_password');
-    if ($error = validate_password($new)) {
-        throw new HttpError(422, $error, ['new_password' => $error]);
-    }
-
-    db()->prepare('UPDATE users SET password_hash = ? WHERE id = ?')
-        ->execute([password_hash($new, PASSWORD_DEFAULT), $userId]);
-    session_regenerate_id(true);
-
-    return ['ok' => true];
 }

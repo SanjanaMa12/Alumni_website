@@ -49,13 +49,6 @@ function str_input(string $key, int $maxLength = 255): string
     return mb_substr(trim((string) $value), 0, $maxLength);
 }
 
-/** Passwords are read untrimmed so leading/trailing spaces stay significant. */
-function password_input(string $key): string
-{
-    $value = input()[$key] ?? '';
-    return is_string($value) ? substr($value, 0, 200) : '';
-}
-
 function bool_input(string $key): bool
 {
     $value = input()[$key] ?? false;
@@ -75,9 +68,34 @@ function set_input(string $key, array $allowed): array
     return array_values(array_intersect($allowed, $value));
 }
 
+/**
+ * The logged-in user, from the JWT in the auth cookie. The account is re-read from the
+ * database on every request, so an alumnus whose verification is withdrawn is logged out
+ * straight away even though their token has not expired yet.
+ */
+function current_user(): ?array
+{
+    static $resolved = false, $user = null;
+    if ($resolved) {
+        return $user;
+    }
+    $resolved = true;
+
+    $token = $_COOKIE[AUTH_COOKIE] ?? '';
+    $claims = $token !== '' ? jwt_decode($token, 'auth') : null;
+    $found = $claims ? find_user((int) $claims['sub']) : null;
+    if ($found && user_can_log_in($found)) {
+        $user = $found;
+    } elseif ($token !== '') {
+        clear_auth_cookie();
+    }
+    return $user;
+}
+
 function current_user_id(): ?int
 {
-    return isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;
+    $user = current_user();
+    return $user ? (int) $user['id'] : null;
 }
 
 function require_login(): int

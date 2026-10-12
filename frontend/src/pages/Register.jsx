@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, Navigate, useParams } from 'react-router-dom'
 import { api } from '../api/client.js'
 import { useApi } from '../api/useApi.js'
 import Field, { CheckboxGroup } from '../components/Field.jsx'
+import OtpInput, { sentMessage, useCooldown } from '../components/OtpInput.jsx'
 import { Alert, ErrorMessage, Loading } from '../components/Status.jsx'
 import YearPicker from '../components/YearPicker.jsx'
 import { useAuth } from '../context/AuthContext.jsx'
@@ -13,14 +14,14 @@ const STEPS = ['Basic', 'Contact', 'Academic', 'More Details']
 // Which step each server-side field error belongs to, so we can jump back to it.
 const FIELD_STEP = {
   full_name: 0, preferred_name: 0,
-  email: 1, phone: 1, password: 1,
+  email: 1, phone: 1,
   faculty: 2, grad_year: 2, reg_no: 2, degree_cert: 2,
   current_country: 3, linkedin: 3, profession_org: 3, contact_by: 3, contribute: 3,
 }
 
 const EMPTY_FORM = {
   full_name: '', preferred_name: '',
-  email: '', phone: '', password: '', password_confirm: '',
+  email: '', phone: '',
   grad_year: null, remember_reg_no: '', reg_no: '', degree_cert: null, directory_consent: false,
   current_country: '', linkedin: '', profession_org: '', alumni_membership: '', contact_by: [], contribute: [],
 }
@@ -34,10 +35,6 @@ function validateStep(step, form, otpVerified) {
   if (step === 1) {
     if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) e.email = 'Enter a valid email address.'
     if (!/^\+?[0-9 ()-]{7,20}$/.test(form.phone.trim())) e.phone = 'Enter a valid phone number.'
-    if (form.password.length < 8 || !/[A-Za-z]/.test(form.password) || !/\d/.test(form.password)) {
-      e.password = 'At least 8 characters, with letters and numbers.'
-    }
-    if (form.password !== form.password_confirm) e.password_confirm = 'Passwords do not match.'
   }
   if (step === 2) {
     if (!form.grad_year) e.grad_year = 'Select your year of graduation.'
@@ -91,22 +88,15 @@ function OtpBox({ email, verified, onVerified, error }) {
   const [code, setCode] = useState('')
   const [status, setStatus] = useState(null)
   const [busy, setBusy] = useState(false)
-  const [cooldown, setCooldown] = useState(0)
-
-  useEffect(() => {
-    if (cooldown <= 0) return
-    const t = setTimeout(() => setCooldown((c) => c - 1), 1000)
-    return () => clearTimeout(t)
-  }, [cooldown])
+  const [cooldown, startCooldown] = useCooldown()
 
   async function send() {
     setBusy(true)
     setStatus(null)
     try {
-      const data = await api.post('/auth/otp/send', { email })
-      const devNote = data.dev_code ? ` (Development mode — your code is ${data.dev_code})` : ''
-      setStatus({ type: 'success', text: data.message + devNote })
-      setCooldown(60)
+      const data = await api.post('/auth/register/otp', { email })
+      setStatus({ type: 'success', text: sentMessage(data) })
+      startCooldown()
     } catch (e) {
       setStatus({ type: 'error', text: e.message })
     } finally {
@@ -118,9 +108,8 @@ function OtpBox({ email, verified, onVerified, error }) {
     setBusy(true)
     setStatus(null)
     try {
-      await api.post('/auth/otp/verify', { email, code })
-      onVerified(email)
-      setStatus(null)
+      const data = await api.post('/auth/register/verify', { email, code })
+      onVerified(email, data.registration_token)
     } catch (e) {
       setStatus({ type: 'error', text: e.message })
     } finally {
@@ -139,19 +128,12 @@ function OtpBox({ email, verified, onVerified, error }) {
   return (
     <div className={`rounded-xl border bg-yellow-50 p-3 ${error ? 'border-red-400' : 'border-yellow-200'}`}>
       <label className="label">Email OTP Verification *</label>
-      <p className="text-xs text-gray-600">We'll send a 6-digit code to {email}.</p>
+      <p className="text-xs text-gray-600">We'll send a 6-digit code to {email}. It is valid for 5 minutes.</p>
       <div className="mt-2 flex flex-wrap gap-2">
         <button type="button" onClick={send} disabled={busy || cooldown > 0} className="btn-primary px-4 py-2 text-xs">
           {cooldown > 0 ? `Resend in ${cooldown}s` : 'Send OTP'}
         </button>
-        <input
-          value={code}
-          onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-          inputMode="numeric"
-          autoComplete="one-time-code"
-          className="min-w-32 flex-1 rounded-lg border bg-white p-2 text-sm"
-          placeholder="Enter OTP"
-        />
+        <OtpInput value={code} onChange={setCode} className="min-w-32 flex-1 rounded-lg border bg-white p-2 text-sm" />
         <button
           type="button"
           onClick={verify}
@@ -167,21 +149,42 @@ function OtpBox({ email, verified, onVerified, error }) {
   )
 }
 
+function Submitted({ message }) {
+  return (
+    <section className="mx-auto max-w-xl px-4 py-16 text-center">
+      <div className="card p-8">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-2xl text-green-700">
+          ✓
+        </div>
+        <h1 className="mt-4 text-2xl font-bold text-maroon">Welcome to the Alumni Family!</h1>
+        <p className="mt-3 text-sm text-gray-600">{message}</p>
+        <p className="mt-3 text-sm text-gray-600">
+          After approval, log in from the <b>Alumni Login</b> tab using only your email: no password needed.
+        </p>
+        <Link to="/" className="btn-primary mt-6">
+          Back to Home
+        </Link>
+      </div>
+    </section>
+  )
+}
+
 export default function Register() {
   const { faculty: facultySlug } = useParams()
   const { data, error: loadError, loading, reload } = useApi('/faculties')
-  const { user, setUser } = useAuth()
-  const navigate = useNavigate()
+  const { user } = useAuth()
 
   const [step, setStep] = useState(0)
   const [form, setForm] = useState(EMPTY_FORM)
   const [errors, setErrors] = useState({})
-  const [verifiedEmail, setVerifiedEmail] = useState(null)
+  const [verification, setVerification] = useState(null) // { email, token } once the OTP is verified
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState(null)
+  const [submitted, setSubmitted] = useState(null)
 
-  const otpVerified = verifiedEmail !== null && verifiedEmail === form.email.trim().toLowerCase()
+  const otpVerified = verification !== null && verification.email === form.email.trim().toLowerCase()
 
+  if (submitted) return <Submitted message={submitted} />
   if (user) return <Navigate to="/profile" replace />
   if (loading) return <Loading />
   if (loadError) return <ErrorMessage error={loadError} onRetry={reload} />
@@ -220,7 +223,7 @@ export default function Register() {
     for (const key of ['full_name', 'preferred_name', 'email', 'phone', 'remember_reg_no']) {
       body.append(key, form[key].trim())
     }
-    body.append('password', form.password)
+    body.append('registration_token', verification.token)
     body.append('grad_year', String(form.grad_year))
     body.append('directory_consent', form.directory_consent ? '1' : '0')
     if (form.remember_reg_no === 'yes') body.append('reg_no', form.reg_no.trim())
@@ -238,8 +241,8 @@ export default function Register() {
     setSubmitError(null)
     try {
       const result = await api.post('/auth/register', body)
-      setUser(result.user)
-      navigate('/profile', { replace: true, state: { welcome: true } })
+      setSubmitted(result.message)
+      window.scrollTo(0, 0)
     } catch (e) {
       setSubmitError(e.message)
       setErrors(e.fields || {})
@@ -326,28 +329,6 @@ export default function Register() {
                     autoComplete="tel"
                   />
                 </Field>
-                <Field label="Password *" error={err('password')}>
-                  <input
-                    type="password"
-                    value={form.password}
-                    onChange={(e) => set('password', e.target.value)}
-                    onKeyDown={onEnter}
-                    className={inputClass('password')}
-                    placeholder="At least 8 characters"
-                    autoComplete="new-password"
-                  />
-                </Field>
-                <Field label="Confirm Password *" error={err('password_confirm')}>
-                  <input
-                    type="password"
-                    value={form.password_confirm}
-                    onChange={(e) => set('password_confirm', e.target.value)}
-                    onKeyDown={onEnter}
-                    className={inputClass('password_confirm')}
-                    placeholder="Re-enter password"
-                    autoComplete="new-password"
-                  />
-                </Field>
               </div>
               <div className="mt-4 flex gap-3">
                 <button type="button" onClick={() => setStep(0)} className="btn-ghost">
@@ -423,8 +404,8 @@ export default function Register() {
                 <OtpBox
                   email={form.email.trim().toLowerCase()}
                   verified={otpVerified}
-                  onVerified={(email) => {
-                    setVerifiedEmail(email)
+                  onVerified={(email, token) => {
+                    setVerification({ email, token })
                     setErrors((e) => ({ ...e, otp: undefined }))
                   }}
                   error={err('otp')}

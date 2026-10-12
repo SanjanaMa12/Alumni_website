@@ -47,12 +47,19 @@ mysql -u root -p aro_alumni < backend/database/seed.sql
 
 Or in **phpMyAdmin**: open the *Import* tab and import `schema.sql`, then select the `aro_alumni` database and import `seed.sql`.
 
-The seed creates two demo accounts (password `Password123`). **Delete them before going live.**
+The seed creates two demo alumni accounts. **Delete them before going live.**
 
-| Email             | Role    |
-| ----------------- | ------- |
-| `alumni@demo.lk`  | Alumni  |
-| `student@demo.lk` | Student |
+| Email             | Alumni Login                                   |
+| ----------------- | ---------------------------------------------- |
+| `alumni@demo.lk`  | Works (verified)                               |
+| `pending@demo.lk` | Refused: registration still pending verification |
+
+For **Student Login** use any made-up university address, e.g. `test.student@sci.pdn.ac.lk`.
+The account is created on first login.
+
+> **Upgrading a database you created before passwordless login?** Run
+> `mysql -u root -p aro_alumni < backend/database/migrations/001_passwordless_login.sql`
+> (or re-import `schema.sql` + `seed.sql` if it only holds test data).
 
 ### 2. Backend config
 
@@ -60,7 +67,12 @@ The seed creates two demo accounts (password `Password123`). **Delete them befor
 cp backend/config/config.example.php backend/config/config.php
 ```
 
-Edit `config.php` with your database user/password. Keep `'debug' => true` while developing.
+Edit `config.php`:
+
+- your database user/password,
+- **`jwt.secret`**: replace it with a long random string. The API refuses to start until you do.
+  Generate one with `php -r "echo bin2hex(random_bytes(32));"`,
+- keep `'debug' => true` while developing.
 
 ### 3. Frontend packages
 
@@ -93,14 +105,30 @@ npm run dev
 ```
 
 Open <http://localhost:5173>. Vite forwards every `/api/...` request to the PHP server, so the browser
-sees a single site and the login session cookie works without CORS setup.
+sees a single site and the login cookie works without CORS setup.
 
-### Email verification (OTP) during development
+### How login works (passwordless)
 
-Registration asks for a 6-digit code sent by email. With `'debug' => true` the API also returns the code
-and the form shows it on screen, so you can register without a mail server. In production set
-`'debug' => false` and configure PHP's `mail()` (or swap in an SMTP library such as PHPMailer in
-`handle_send_otp()` in [backend/src/handlers/auth.php](backend/src/handlers/auth.php)).
+There are no passwords. Both tabs on the Login page work the same way:
+**Enter email → Send OTP → enter the 6-digit code → Verify & Login.**
+
+| Tab           | Who may log in                                                                    |
+| ------------- | --------------------------------------------------------------------------------- |
+| Student Login | Emails on `@pdn.ac.lk` or any subdomain (`@sci.pdn.ac.lk`, `@eng.pdn.ac.lk`…)    |
+| Alumni Login  | Emails of alumni accounts with `verification_status = 'verified'`                 |
+
+- Codes expire after **5 minutes**. Max **3 codes per email per 15 minutes**, 10 per IP address, and
+  5 wrong guesses per code.
+- After a correct code the API issues a **JWT** (signed with `jwt.secret`, valid 7 days) in an
+  **httpOnly cookie**, so page scripts can never read it.
+- All of these numbers and the student domains are in `config.php`.
+
+### Email codes (OTP) during development
+
+With `'debug' => true` the API also returns the code and the page shows it on screen, so you can log in
+and register without a mail server. In production set `'debug' => false` and configure PHP's `mail()`
+(or swap in an SMTP library such as PHPMailer in `otp_issue()` in
+[backend/src/handlers/otp.php](backend/src/handlers/otp.php)).
 
 ## API
 
@@ -109,11 +137,12 @@ All responses are JSON. Errors look like `{"error": "message", "fields": {"email
 | Method   | Path                        | Login | Purpose                                    |
 | -------- | --------------------------- | :---: | ------------------------------------------ |
 | `GET`    | `/api/auth/me`              |       | Current user (or `null`)                   |
-| `POST`   | `/api/auth/login`           |       | `{email, password, role}`                  |
-| `POST`   | `/api/auth/logout`          |       |                                            |
-| `POST`   | `/api/auth/otp/send`        |       | Email a 6-digit code `{email}`             |
-| `POST`   | `/api/auth/otp/verify`      |       | `{email, code}`                            |
-| `POST`   | `/api/auth/register`        |       | multipart form (may include a certificate) |
+| `POST`   | `/api/auth/login/otp`       |       | Email a login code `{email, role}`         |
+| `POST`   | `/api/auth/login/verify`    |       | `{email, role, code}` → sets JWT cookie    |
+| `POST`   | `/api/auth/logout`          |       | Clears the JWT cookie                      |
+| `POST`   | `/api/auth/register/otp`    |       | Email a verification code `{email}`        |
+| `POST`   | `/api/auth/register/verify` |       | `{email, code}` → `registration_token`     |
+| `POST`   | `/api/auth/register`        |       | multipart form + `registration_token`      |
 | `GET`    | `/api/faculties`            |       |                                            |
 | `GET`    | `/api/people`               |       | Patrons grouped by committee               |
 | `GET`    | `/api/projects`             |       |                                            |
@@ -122,16 +151,15 @@ All responses are JSON. Errors look like `{"error": "message", "fields": {"email
 | `DELETE` | `/api/events/{id}/register` |  ✔   | Cancel attendance                          |
 | `GET`    | `/api/directory`            |  ✔   | `?q=&faculty=&year=&page=`                 |
 | `PUT`    | `/api/profile`              |  ✔   | Update your details                        |
-| `POST`   | `/api/profile/password`     |  ✔   | `{current_password, new_password}`         |
 
 To add an endpoint, write a function in `backend/src/handlers/` and register it in
 [backend/src/routes.php](backend/src/routes.php).
 
 ## How verification works
 
-New registrations are saved with `verification_status = 'pending'`. The ARO checks the registration
-number or uploaded certificate and then sets the status to `verified`. Until there is an admin panel,
-do it in phpMyAdmin or with:
+New registrations are saved with `verification_status = 'pending'` and **cannot log in yet**.
+The ARO checks the registration number or uploaded certificate and then sets the status to `verified`,
+after which Alumni Login works. Until there is an admin panel, do it in phpMyAdmin or with:
 
 ```sql
 UPDATE users SET verification_status = 'verified' WHERE email = 'someone@example.com';
@@ -145,7 +173,8 @@ name, faculty and batch are shown, which is what the registration form promises.
 1. `cd frontend && npm run build`
 2. Upload the **contents** of `frontend/dist/` to the web root (e.g. `public_html/`).
 3. Upload the `backend/` folder into the same web root, so you have `public_html/backend/`.
-4. Create `backend/config/config.php` on the server with the live database details and `'debug' => false`.
+4. Create `backend/config/config.php` on the server with the live database details, a new random
+   `jwt.secret`, and `'debug' => false`. Serve the site over **HTTPS**.
 5. Import `schema.sql` (and optionally `seed.sql`, minus the demo users) into the live database.
 6. Make sure `backend/storage/uploads/` is writable by the web server.
 
@@ -157,5 +186,4 @@ The site is built to run at the root of a domain or subdomain (e.g. `alumni.pdn.
 
 - Admin panel (verify alumni, manage events/projects/people). Use phpMyAdmin for now.
 - Blog (linked in the old design but never built)
-- Self-service password reset (the "Forgot Password?" link emails the ARO)
-- Student self-registration
+- Admin login screens (an `admin` account can already log in on either tab)

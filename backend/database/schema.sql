@@ -33,7 +33,6 @@ CREATE TABLE users (
   id                   INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   role                 ENUM('alumni','student','admin') NOT NULL DEFAULT 'alumni',
   email                VARCHAR(190) NOT NULL UNIQUE,
-  password_hash        VARCHAR(255) NOT NULL,
   full_name            VARCHAR(200) NOT NULL,
   preferred_name       VARCHAR(100) NOT NULL,
   phone                VARCHAR(30)  NULL,
@@ -56,15 +55,20 @@ CREATE TABLE users (
   INDEX idx_users_grad_year (grad_year)
 ) ENGINE=InnoDB;
 
--- One-time codes sent to an email address before registration.
+-- One-time codes emailed for login and for verifying a new registration.
+-- Rows are kept for 24 hours so requests can be rate limited.
 CREATE TABLE email_verifications (
   id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   email       VARCHAR(190) NOT NULL,
+  purpose     ENUM('login','register') NOT NULL,
   code_hash   VARCHAR(255) NOT NULL,
   attempts    TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  ip          VARCHAR(45) NOT NULL DEFAULT '',
+  created_at  DATETIME NOT NULL,
   expires_at  DATETIME NOT NULL,
-  created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  INDEX idx_email_verifications_email (email)
+  used_at     DATETIME NULL,
+  INDEX idx_email_verifications_email (email, purpose, created_at),
+  INDEX idx_email_verifications_ip (ip, created_at)
 ) ENGINE=InnoDB;
 
 CREATE TABLE events (

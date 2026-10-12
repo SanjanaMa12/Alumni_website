@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useLocation } from 'react-router-dom'
 import { api } from '../api/client.js'
 import Field, { CheckboxGroup } from '../components/Field.jsx'
 import { Alert } from '../components/Status.jsx'
@@ -20,6 +19,7 @@ const STATUS = {
 
 function editableFields(user) {
   return {
+    full_name: user.full_name || '',
     preferred_name: user.preferred_name || '',
     phone: user.phone || '',
     directory_consent: user.directory_consent,
@@ -41,67 +41,15 @@ function Detail({ label, children }) {
   )
 }
 
-function PasswordForm() {
-  const [form, setForm] = useState({ current_password: '', new_password: '' })
+export default function Profile() {
+  const { user, setUser } = useAuth()
+  const [form, setForm] = useState(() => editableFields(user))
+  const [errors, setErrors] = useState({})
   const [status, setStatus] = useState(null)
   const [busy, setBusy] = useState(false)
 
-  async function submit(e) {
-    e.preventDefault()
-    setBusy(true)
-    setStatus(null)
-    try {
-      await api.post('/profile/password', form)
-      setForm({ current_password: '', new_password: '' })
-      setStatus({ type: 'success', text: 'Password updated.' })
-    } catch (err) {
-      setStatus({ type: 'error', text: err.message })
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  return (
-    <form onSubmit={submit} className="card space-y-4 p-6">
-      <h2 className="text-lg font-bold text-maroon">Change Password</h2>
-      <Field label="Current password">
-        <input
-          type="password"
-          required
-          value={form.current_password}
-          onChange={(e) => setForm({ ...form, current_password: e.target.value })}
-          className="input"
-          autoComplete="current-password"
-        />
-      </Field>
-      <Field label="New password">
-        <input
-          type="password"
-          required
-          value={form.new_password}
-          onChange={(e) => setForm({ ...form, new_password: e.target.value })}
-          className="input"
-          placeholder="At least 8 characters, letters and numbers"
-          autoComplete="new-password"
-        />
-      </Field>
-      {status && <Alert type={status.type}>{status.text}</Alert>}
-      <button type="submit" disabled={busy} className="btn-outline">
-        {busy ? 'Saving…' : 'Update password'}
-      </button>
-    </form>
-  )
-}
-
-export default function Profile() {
-  const { user, setUser } = useAuth()
-  const location = useLocation()
-  const [form, setForm] = useState(() => editableFields(user))
-  const [errors, setErrors] = useState({})
-  const [status, setStatus] = useState(location.state?.welcome ? { type: 'success', text: 'Welcome to the alumni family! Your registration was received.' } : null)
-  const [busy, setBusy] = useState(false)
-
   const isAlumni = user.role === 'alumni'
+  const isStudent = user.role === 'student'
   const set = (field, value) => setForm((f) => ({ ...f, [field]: value }))
 
   async function save(e) {
@@ -153,16 +101,30 @@ export default function Profile() {
                 <span className="capitalize">{user.role}</span>
               </Detail>
             </dl>
-            <p className="mt-4 text-xs text-gray-500">
-              To correct these details, contact <a href="mailto:aro@pdn.ac.lk" className="underline">aro@pdn.ac.lk</a>.
-            </p>
+            {isAlumni && (
+              <p className="mt-4 text-xs text-gray-500">
+                To correct these details, contact{' '}
+                <a href="mailto:aro@pdn.ac.lk" className="underline">
+                  aro@pdn.ac.lk
+                </a>
+                .
+              </p>
+            )}
           </div>
-          <PasswordForm />
         </div>
 
         <form onSubmit={save} className="card p-6" noValidate>
           <h2 className="text-lg font-bold text-maroon">Your Details</h2>
           <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+            {isStudent && (
+              <Field label="Full Name *" error={errors.full_name} className="md:col-span-2">
+                <input
+                  value={form.full_name}
+                  onChange={(e) => set('full_name', e.target.value)}
+                  className={`input ${errors.full_name ? 'input-error' : ''}`}
+                />
+              </Field>
+            )}
             <Field label="Preferred Name *" error={errors.preferred_name}>
               <input
                 value={form.preferred_name}
