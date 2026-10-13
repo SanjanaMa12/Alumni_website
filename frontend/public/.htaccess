@@ -1,0 +1,13 @@
+# Apache rules for the deployed site (copied into dist/ by `npm run build`).
+# Expected layout on the server (web root):
+#   index.html, assets/, images/, video/   <- contents of frontend/dist
+#   backend/                               <- the backend folder
+RewriteEngine On
+
+# API requests go to the PHP front controller.
+RewriteRule ^api/ backend/public/index.php [QSA,L]
+
+# Everything else that is not a real file is a React page.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [L]
